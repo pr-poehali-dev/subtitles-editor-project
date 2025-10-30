@@ -3,9 +3,23 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { Badge } from '@/components/ui/badge';
 import Icon from '@/components/ui/icon';
 
-const teas = [
+interface Tea {
+  id: number;
+  name: string;
+  description: string;
+  price: number;
+  weight: string;
+  image: string;
+}
+
+interface CartItem extends Tea {
+  quantity: number;
+}
+
+const teas: Tea[] = [
   {
     id: 1,
     name: 'Травяной сбор "Луговой"',
@@ -58,6 +72,55 @@ const teas = [
 
 const Index = () => {
   const [activeSection, setActiveSection] = useState('home');
+  const [cart, setCart] = useState<CartItem[]>([]);
+  const [isCartOpen, setIsCartOpen] = useState(false);
+  const [orderForm, setOrderForm] = useState({
+    name: '',
+    phone: '',
+    email: '',
+    address: '',
+    comment: ''
+  });
+
+  const addToCart = (tea: Tea) => {
+    const existingItem = cart.find(item => item.id === tea.id);
+    if (existingItem) {
+      setCart(cart.map(item => 
+        item.id === tea.id 
+          ? { ...item, quantity: item.quantity + 1 }
+          : item
+      ));
+    } else {
+      setCart([...cart, { ...tea, quantity: 1 }]);
+    }
+    setIsCartOpen(true);
+  };
+
+  const updateQuantity = (id: number, newQuantity: number) => {
+    if (newQuantity === 0) {
+      setCart(cart.filter(item => item.id !== id));
+    } else {
+      setCart(cart.map(item => 
+        item.id === id ? { ...item, quantity: newQuantity } : item
+      ));
+    }
+  };
+
+  const getTotalPrice = () => {
+    return cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  };
+
+  const getTotalItems = () => {
+    return cart.reduce((sum, item) => sum + item.quantity, 0);
+  };
+
+  const handleSubmitOrder = (e: React.FormEvent) => {
+    e.preventDefault();
+    alert('Спасибо за заказ! Мы свяжемся с вами в ближайшее время.');
+    setCart([]);
+    setOrderForm({ name: '', phone: '', email: '', address: '', comment: '' });
+    setActiveSection('home');
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -68,7 +131,7 @@ const Index = () => {
               <Icon name="Leaf" className="text-primary" size={32} />
               <span className="text-2xl font-bold text-primary">ЧайЛист</span>
             </div>
-            <div className="flex gap-6">
+            <div className="flex items-center gap-6">
               <button
                 onClick={() => setActiveSection('home')}
                 className={`text-lg font-medium transition-colors hover:text-primary ${
@@ -93,10 +156,95 @@ const Index = () => {
               >
                 Контакты
               </button>
+              <button
+                onClick={() => setIsCartOpen(!isCartOpen)}
+                className="relative"
+              >
+                <Icon name="ShoppingCart" className="text-foreground hover:text-primary transition-colors" size={28} />
+                {getTotalItems() > 0 && (
+                  <Badge className="absolute -top-2 -right-2 h-6 w-6 flex items-center justify-center p-0 text-xs">
+                    {getTotalItems()}
+                  </Badge>
+                )}
+              </button>
             </div>
           </div>
         </div>
       </nav>
+
+      {isCartOpen && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-start justify-end">
+          <div className="bg-card h-full w-full max-w-md shadow-2xl overflow-y-auto">
+            <div className="sticky top-0 bg-card border-b p-4 flex items-center justify-between">
+              <h2 className="text-2xl font-bold">Корзина</h2>
+              <button onClick={() => setIsCartOpen(false)}>
+                <Icon name="X" size={24} />
+              </button>
+            </div>
+            
+            {cart.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-20 px-4">
+                <Icon name="ShoppingCart" size={64} className="text-muted-foreground mb-4" />
+                <p className="text-xl text-muted-foreground text-center">Корзина пуста</p>
+                <Button className="mt-6" onClick={() => { setIsCartOpen(false); setActiveSection('catalog'); }}>
+                  Перейти в каталог
+                </Button>
+              </div>
+            ) : (
+              <>
+                <div className="p-4 space-y-4">
+                  {cart.map((item) => (
+                    <Card key={item.id} className="p-4 border-2">
+                      <div className="flex gap-4">
+                        <img src={item.image} alt={item.name} className="w-20 h-20 object-cover rounded-lg" />
+                        <div className="flex-1">
+                          <h3 className="font-semibold mb-1">{item.name}</h3>
+                          <p className="text-sm text-muted-foreground mb-2">{item.weight}</p>
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                              >
+                                <Icon name="Minus" size={14} />
+                              </Button>
+                              <span className="font-medium w-8 text-center">{item.quantity}</span>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                              >
+                                <Icon name="Plus" size={14} />
+                              </Button>
+                            </div>
+                            <span className="font-bold text-primary">{item.price * item.quantity} ₽</span>
+                          </div>
+                        </div>
+                      </div>
+                    </Card>
+                  ))}
+                </div>
+
+                <div className="sticky bottom-0 bg-card border-t p-4 space-y-4">
+                  <div className="flex items-center justify-between text-xl font-bold">
+                    <span>Итого:</span>
+                    <span className="text-primary">{getTotalPrice()} ₽</span>
+                  </div>
+                  <Button 
+                    className="w-full" 
+                    size="lg"
+                    onClick={() => { setIsCartOpen(false); setActiveSection('checkout'); }}
+                  >
+                    Оформить заказ
+                    <Icon name="ArrowRight" size={20} className="ml-2" />
+                  </Button>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      )}
 
       {activeSection === 'home' && (
         <section className="py-20">
@@ -149,7 +297,7 @@ const Index = () => {
                     <p className="text-muted-foreground mb-4 min-h-[60px]">{tea.description}</p>
                     <div className="flex items-center justify-between">
                       <span className="text-2xl font-bold text-primary">{tea.price} ₽</span>
-                      <Button className="gap-2">
+                      <Button className="gap-2" onClick={() => addToCart(tea)}>
                         Заказать
                         <Icon name="ShoppingCart" size={18} />
                       </Button>
@@ -157,6 +305,123 @@ const Index = () => {
                   </div>
                 </Card>
               ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {activeSection === 'checkout' && (
+        <section className="py-16">
+          <div className="container mx-auto px-4 max-w-5xl">
+            <div className="text-center mb-12">
+              <h2 className="text-4xl font-bold mb-4">Оформление заказа</h2>
+              <p className="text-lg text-muted-foreground">Заполните данные для доставки</p>
+            </div>
+            <div className="grid md:grid-cols-2 gap-8">
+              <div>
+                <Card className="p-6 border-2 mb-6">
+                  <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
+                    <Icon name="ShoppingBag" className="text-primary" />
+                    Ваш заказ
+                  </h3>
+                  <div className="space-y-3 mb-4">
+                    {cart.map((item) => (
+                      <div key={item.id} className="flex justify-between items-center py-2 border-b">
+                        <div className="flex-1">
+                          <p className="font-medium">{item.name}</p>
+                          <p className="text-sm text-muted-foreground">{item.weight} × {item.quantity}</p>
+                        </div>
+                        <span className="font-semibold">{item.price * item.quantity} ₽</span>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="border-t pt-4 space-y-2">
+                    <div className="flex justify-between text-muted-foreground">
+                      <span>Товары ({getTotalItems()} шт.)</span>
+                      <span>{getTotalPrice()} ₽</span>
+                    </div>
+                    <div className="flex justify-between text-muted-foreground">
+                      <span>Доставка</span>
+                      <span>Бесплатно</span>
+                    </div>
+                    <div className="flex justify-between text-2xl font-bold text-primary pt-2 border-t">
+                      <span>Итого:</span>
+                      <span>{getTotalPrice()} ₽</span>
+                    </div>
+                  </div>
+                </Card>
+              </div>
+
+              <Card className="p-6 border-2">
+                <h3 className="text-xl font-bold mb-6 flex items-center gap-2">
+                  <Icon name="User" className="text-primary" />
+                  Данные покупателя
+                </h3>
+                <form onSubmit={handleSubmitOrder} className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium mb-2">
+                      Ваше имя <span className="text-destructive">*</span>
+                    </label>
+                    <Input 
+                      required
+                      placeholder="Иван Иванов" 
+                      value={orderForm.name}
+                      onChange={(e) => setOrderForm({...orderForm, name: e.target.value})}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-2">
+                      Телефон <span className="text-destructive">*</span>
+                    </label>
+                    <Input 
+                      required
+                      type="tel"
+                      placeholder="+7 (999) 123-45-67" 
+                      value={orderForm.phone}
+                      onChange={(e) => setOrderForm({...orderForm, phone: e.target.value})}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-2">
+                      Email <span className="text-destructive">*</span>
+                    </label>
+                    <Input 
+                      required
+                      type="email"
+                      placeholder="ivan@example.com" 
+                      value={orderForm.email}
+                      onChange={(e) => setOrderForm({...orderForm, email: e.target.value})}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-2">
+                      Адрес доставки <span className="text-destructive">*</span>
+                    </label>
+                    <Textarea 
+                      required
+                      placeholder="Город, улица, дом, квартира" 
+                      rows={3}
+                      value={orderForm.address}
+                      onChange={(e) => setOrderForm({...orderForm, address: e.target.value})}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-2">
+                      Комментарий к заказу
+                    </label>
+                    <Textarea 
+                      placeholder="Пожелания к доставке или вопросы" 
+                      rows={3}
+                      value={orderForm.comment}
+                      onChange={(e) => setOrderForm({...orderForm, comment: e.target.value})}
+                    />
+                  </div>
+                  <Button type="submit" className="w-full" size="lg">
+                    Подтвердить заказ
+                    <Icon name="Check" size={20} className="ml-2" />
+                  </Button>
+                </form>
+              </Card>
             </div>
           </div>
         </section>
