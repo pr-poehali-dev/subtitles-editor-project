@@ -19,7 +19,16 @@ interface CartItem extends Tea {
   quantity: number;
 }
 
-const teas: Tea[] = [];
+const teas: Tea[] = [
+  {
+    id: 1,
+    name: 'Сбор "Молодильный"',
+    description: 'Иван-чай, зверобой, клевер, шалфей, календула, ромашка',
+    price: 450,
+    weight: '80г',
+    image: 'https://cdn.poehali.dev/projects/4a950c3e-2eae-4a1d-a94b-cfdceda3c83a/files/03ff36d3-227e-44db-8c93-8b7cf2142910.jpg'
+  }
+];
 
 const Index = () => {
   const [activeSection, setActiveSection] = useState('home');
