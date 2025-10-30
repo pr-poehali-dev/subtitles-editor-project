@@ -79,7 +79,9 @@ const Index = () => {
     phone: '',
     email: '',
     address: '',
-    comment: ''
+    comment: '',
+    deliveryMethod: 'courier',
+    paymentMethod: 'card'
   });
 
   const addToCart = (tea: Tea) => {
@@ -114,11 +116,21 @@ const Index = () => {
     return cart.reduce((sum, item) => sum + item.quantity, 0);
   };
 
+  const getDeliveryPrice = () => {
+    if (orderForm.deliveryMethod === 'courier') return getTotalPrice() >= 2000 ? 0 : 300;
+    if (orderForm.deliveryMethod === 'pickup') return 0;
+    return 400;
+  };
+
+  const getFinalPrice = () => {
+    return getTotalPrice() + getDeliveryPrice();
+  };
+
   const handleSubmitOrder = (e: React.FormEvent) => {
     e.preventDefault();
     alert('Спасибо за заказ! Мы свяжемся с вами в ближайшее время.');
     setCart([]);
-    setOrderForm({ name: '', phone: '', email: '', address: '', comment: '' });
+    setOrderForm({ name: '', phone: '', email: '', address: '', comment: '', deliveryMethod: 'courier', paymentMethod: 'card' });
     setActiveSection('home');
   };
 
@@ -342,12 +354,119 @@ const Index = () => {
                     </div>
                     <div className="flex justify-between text-muted-foreground">
                       <span>Доставка</span>
-                      <span>Бесплатно</span>
+                      <span>{getDeliveryPrice() === 0 ? 'Бесплатно' : `${getDeliveryPrice()} ₽`}</span>
                     </div>
                     <div className="flex justify-between text-2xl font-bold text-primary pt-2 border-t">
                       <span>Итого:</span>
-                      <span>{getTotalPrice()} ₽</span>
+                      <span>{getFinalPrice()} ₽</span>
                     </div>
+                  </div>
+                </Card>
+
+                <Card className="p-6 border-2 mb-6">
+                  <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
+                    <Icon name="Truck" className="text-primary" />
+                    Способ доставки
+                  </h3>
+                  <div className="space-y-3">
+                    <label className="flex items-start gap-3 p-4 border-2 rounded-lg cursor-pointer hover:border-primary transition-colors">
+                      <input
+                        type="radio"
+                        name="delivery"
+                        value="courier"
+                        checked={orderForm.deliveryMethod === 'courier'}
+                        onChange={(e) => setOrderForm({...orderForm, deliveryMethod: e.target.value})}
+                        className="mt-1"
+                      />
+                      <div className="flex-1">
+                        <div className="font-semibold mb-1">Курьерская доставка</div>
+                        <div className="text-sm text-muted-foreground">1-2 дня, бесплатно от 2000 ₽</div>
+                        <div className="text-sm font-medium mt-1">
+                          {getTotalPrice() >= 2000 ? 'Бесплатно' : '300 ₽'}
+                        </div>
+                      </div>
+                    </label>
+                    <label className="flex items-start gap-3 p-4 border-2 rounded-lg cursor-pointer hover:border-primary transition-colors">
+                      <input
+                        type="radio"
+                        name="delivery"
+                        value="pickup"
+                        checked={orderForm.deliveryMethod === 'pickup'}
+                        onChange={(e) => setOrderForm({...orderForm, deliveryMethod: e.target.value})}
+                        className="mt-1"
+                      />
+                      <div className="flex-1">
+                        <div className="font-semibold mb-1">Самовывоз</div>
+                        <div className="text-sm text-muted-foreground">г. Москва, ул. Чайная, д. 15</div>
+                        <div className="text-sm font-medium mt-1">Бесплатно</div>
+                      </div>
+                    </label>
+                    <label className="flex items-start gap-3 p-4 border-2 rounded-lg cursor-pointer hover:border-primary transition-colors">
+                      <input
+                        type="radio"
+                        name="delivery"
+                        value="express"
+                        checked={orderForm.deliveryMethod === 'express'}
+                        onChange={(e) => setOrderForm({...orderForm, deliveryMethod: e.target.value})}
+                        className="mt-1"
+                      />
+                      <div className="flex-1">
+                        <div className="font-semibold mb-1">Экспресс-доставка</div>
+                        <div className="text-sm text-muted-foreground">Доставка в течение 3-4 часов</div>
+                        <div className="text-sm font-medium mt-1">400 ₽</div>
+                      </div>
+                    </label>
+                  </div>
+                </Card>
+
+                <Card className="p-6 border-2">
+                  <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
+                    <Icon name="CreditCard" className="text-primary" />
+                    Способ оплаты
+                  </h3>
+                  <div className="space-y-3">
+                    <label className="flex items-start gap-3 p-4 border-2 rounded-lg cursor-pointer hover:border-primary transition-colors">
+                      <input
+                        type="radio"
+                        name="payment"
+                        value="card"
+                        checked={orderForm.paymentMethod === 'card'}
+                        onChange={(e) => setOrderForm({...orderForm, paymentMethod: e.target.value})}
+                        className="mt-1"
+                      />
+                      <div className="flex-1">
+                        <div className="font-semibold mb-1">Онлайн оплата картой</div>
+                        <div className="text-sm text-muted-foreground">Visa, Mastercard, МИР</div>
+                      </div>
+                    </label>
+                    <label className="flex items-start gap-3 p-4 border-2 rounded-lg cursor-pointer hover:border-primary transition-colors">
+                      <input
+                        type="radio"
+                        name="payment"
+                        value="cash"
+                        checked={orderForm.paymentMethod === 'cash'}
+                        onChange={(e) => setOrderForm({...orderForm, paymentMethod: e.target.value})}
+                        className="mt-1"
+                      />
+                      <div className="flex-1">
+                        <div className="font-semibold mb-1">Наличными курьеру</div>
+                        <div className="text-sm text-muted-foreground">При получении заказа</div>
+                      </div>
+                    </label>
+                    <label className="flex items-start gap-3 p-4 border-2 rounded-lg cursor-pointer hover:border-primary transition-colors">
+                      <input
+                        type="radio"
+                        name="payment"
+                        value="sbp"
+                        checked={orderForm.paymentMethod === 'sbp'}
+                        onChange={(e) => setOrderForm({...orderForm, paymentMethod: e.target.value})}
+                        className="mt-1"
+                      />
+                      <div className="flex-1">
+                        <div className="font-semibold mb-1">Система быстрых платежей</div>
+                        <div className="text-sm text-muted-foreground">Перевод по номеру телефона</div>
+                      </div>
+                    </label>
                   </div>
                 </Card>
               </div>
