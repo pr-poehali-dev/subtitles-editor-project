@@ -19,56 +19,7 @@ interface CartItem extends Tea {
   quantity: number;
 }
 
-const teas: Tea[] = [
-  {
-    id: 1,
-    name: 'Травяной сбор "Луговой"',
-    description: 'Натуральный сбор из луговых трав с мятой, мелиссой и чабрецом. Успокаивает и тонизирует.',
-    price: 450,
-    weight: '100г',
-    image: 'https://cdn.poehali.dev/projects/4a950c3e-2eae-4a1d-a94b-cfdceda3c83a/files/03ff36d3-227e-44db-8c93-8b7cf2142910.jpg'
-  },
-  {
-    id: 2,
-    name: 'Черный чай "Граф Грей"',
-    description: 'Классический черный чай с бергамотом. Изысканный аромат и насыщенный вкус.',
-    price: 520,
-    weight: '100г',
-    image: 'https://cdn.poehali.dev/projects/4a950c3e-2eae-4a1d-a94b-cfdceda3c83a/files/7273e76d-86eb-4f8f-93e0-bd0870623be6.jpg'
-  },
-  {
-    id: 3,
-    name: 'Ромашковый сбор',
-    description: 'Нежный ромашковый чай с добавлением липы и мяты. Идеален перед сном.',
-    price: 380,
-    weight: '100г',
-    image: 'https://cdn.poehali.dev/projects/4a950c3e-2eae-4a1d-a94b-cfdceda3c83a/files/665c072a-968d-4fa1-ae86-0dba970dbf09.jpg'
-  },
-  {
-    id: 4,
-    name: 'Витаминный микс',
-    description: 'Фруктово-ягодный сбор с шиповником, яблоком и малиной. Богат витаминами.',
-    price: 490,
-    weight: '100г',
-    image: 'https://cdn.poehali.dev/projects/4a950c3e-2eae-4a1d-a94b-cfdceda3c83a/files/03ff36d3-227e-44db-8c93-8b7cf2142910.jpg'
-  },
-  {
-    id: 5,
-    name: 'Зеленый с жасмином',
-    description: 'Премиальный зеленый чай с цветами жасмина. Деликатный цветочный аромат.',
-    price: 580,
-    weight: '100г',
-    image: 'https://cdn.poehali.dev/projects/4a950c3e-2eae-4a1d-a94b-cfdceda3c83a/files/7273e76d-86eb-4f8f-93e0-bd0870623be6.jpg'
-  },
-  {
-    id: 6,
-    name: 'Иван-чай ферментированный',
-    description: 'Традиционный русский чай. Не содержит кофеин, укрепляет иммунитет.',
-    price: 420,
-    weight: '100г',
-    image: 'https://cdn.poehali.dev/projects/4a950c3e-2eae-4a1d-a94b-cfdceda3c83a/files/665c072a-968d-4fa1-ae86-0dba970dbf09.jpg'
-  }
-];
+const teas: Tea[] = [];
 
 const Index = () => {
   const [activeSection, setActiveSection] = useState('home');
