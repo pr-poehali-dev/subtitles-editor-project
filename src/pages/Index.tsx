@@ -262,9 +262,9 @@ const Index = () => {
         <section className="py-20">
           <div className="container mx-auto px-4">
             <div className="flex flex-col items-center text-center max-w-3xl mx-auto">
-              <div className="inline-flex items-center gap-2 bg-accent/20 px-6 py-2 rounded-full mb-6">
-                <Icon name="Sparkles" size={20} className="text-accent" />
-                <span className="font-medium text-accent">100% натуральные сборы</span>
+              <div className="inline-flex items-center gap-2 bg-primary/10 px-6 py-2 rounded-full mb-6 border-2 border-primary/20">
+                <Icon name="Leaf" size={20} className="text-primary" />
+                <span className="font-medium text-primary">100% натуральные сборы</span>
               </div>
               <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight">
                 Чайные сборы <br />
@@ -302,7 +302,7 @@ const Index = () => {
                   <div className="p-6">
                     <div className="flex items-start justify-between mb-3">
                       <h3 className="text-xl font-bold">{tea.name}</h3>
-                      <span className="text-sm text-muted-foreground bg-muted px-3 py-1 rounded-full">
+                      <span className="text-sm text-primary bg-primary/10 px-3 py-1 rounded-full font-medium">
                         {tea.weight}
                       </span>
                     </div>
